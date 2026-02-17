@@ -34,17 +34,16 @@ A continuación, se describen las tareas que debes realizar en el framework Angu
 ### **Instrucciones de entrega**  
 
 1. **Rama para cambios:**  
-   - En Git Hub Haz clic en el botón Fork (ubicado en la esquina superior derecha del repositorio)
-   - Clonar el Fork en tu máquina local
-   - Crea una rama en el repositorio siguiendo el formato: **[Tus iniciales]_[Número de identificación]**.
+   - Clonar el repositorio en tu máquina local
+   - Crea una rama en el repositorio siguiendo el formato: [Tus iniciales]_[Número de identificación].
    - Realiza todos los cambios necesarios en esta rama.
 
-2. **Pull Request:**  
-   - Una vez completadas las tareas, sube tus cambios al repositorio.  
-   - Crea un **Pull Request** desde la rama de tu fork hacia la rama principal del repositorio original.  
+2. **Sube los cambios a tu repositorio:**  
+   - Una vez completadas las tareas, sube tus cambios a un repositorio publico en tu cuenta de github. 
+   - Envianos un correo con la ruta del repositorio.  
 
 3. **Entrega alternativa:**  
-   - Si encuentras dificultades para realizar el Pull Request, sigue estos pasos:  
+   - Si encuentras dificultades para publicar en tu repositorio, sigue estos pasos: 
      - Comprime la carpeta del proyecto Angular.  
      - Excluye carpetas innecesarias como `node_modules`.  
      - Sube el archivo comprimido a una plataforma de almacenamiento en la nube (OneDrive, Google Drive, etc.).  
