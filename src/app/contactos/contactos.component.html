@@ -1,0 +1,75 @@
+<p-card header="Contactos">
+
+  <!-- TOOLBAR -->
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button severity="success" label="Nueva" styleClass="mr-2" (onClick)="openNew()">
+        <i class="bi bi-plus-circle-dotted mr-2"></i>
+      </p-button>
+
+      <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [disabled]="!selectedContactos.length"
+        styleClass="mr-2" (onClick)="deleteSelected()"></p-button>
+
+      <button pButton label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" styleClass="mr-2"
+        (click)="volverEntidades()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <!-- BUSCADOR -->
+
+
+  <!-- TABLA DE CONTACTOS -->
+  <p-table #dt [value]="contactos" [(selection)]="selectedContactos" dataKey="id" [paginator]="true" [rows]="5"
+    [responsiveLayout]="'scroll'" [globalFilterFields]="['nombre','correo','telefono','cargo','entidad.nombrec']">
+
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h5 class="m-0">Lista de contactos</h5>
+
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" (input)="applyFilter($event)" placeholder="Buscar..." class="buscador" />
+        </span>
+
+      </div>
+    </ng-template>
+
+    <!-- HEADER -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Cargo</th>
+        <th>Entidad</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+
+    <!-- BODY -->
+    <ng-template pTemplate="body" let-contacto>
+      <tr>
+        <td><p-tableCheckbox [value]="contacto"></p-tableCheckbox></td>
+        <td>{{ contacto.nombre }}</td>
+        <td>{{ contacto.correo }}</td>
+        <td>{{ contacto.telefono }}</td>
+        <td>{{ contacto.cargo }}</td>
+        <td>{{ contacto.entidad?.nombrec }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" severity="info" [rounded]="true" [outlined]="true" class="mr-2"
+            (onClick)="edit(contacto)"></p-button>
+          <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+            (onClick)="delete(contacto)">
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+
+  <!-- MODAL CONTACTO -->
+  <app-modal-contacto [(visible)]="contactoDialog" [contacto]="contacto" (saveContacto)="saveContactoHandler($event)">
+  </app-modal-contacto>
+
+</p-card>

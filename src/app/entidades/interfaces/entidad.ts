@@ -1,6 +1,6 @@
 export interface Entidad {
     id:         number;
-    nombre:     string;
+    nombrec:     string;
     nit:        string;
     direccion:  string;
     telefono:   string;

@@ -1,50 +1,56 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { StateEntidad } from '../interfaces/state-entidad';
+import { Injectable, inject, signal } from '@angular/core';
 import { Entidad } from '../interfaces/entidad';
-import { delay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntidadesService {
-  private http = inject(HttpClient)
-  url: string = "http://127.0.0.1:8000/api/"
-  #state = signal<StateEntidad>({
-    loading: true,
-    entidades: []
-  })
 
-  entidades = computed(() => this.#state().entidades);
-  loading = computed(() => this.#state().loading);
+  private http = inject(HttpClient);
+  private url = 'http://127.0.0.1:8000/api/entidades';
+
+  entidades = signal<Entidad[]>([]);
+  loading = signal<boolean>(false); // 🔥 AGREGAR ESTO
+
   constructor() {
-    this.refresh();
+    this.load();
   }
 
-  /** Método para refrescar los datos */
-  refresh(): void {
-    this.#state.set({ loading: true, entidades: [] }) // Actualiza el estado a "cargando" y vacia las entidades
-    this.http.get<Entidad[]>(`${this.url}entidades`).subscribe({
-      next: (res) => {
-        this.#state.set({
-          loading: false,
-          entidades: res,
-        });
-      },
-      error: (error) => {
-        console.error('Error al cargar entidades:', error);
-      }
-    });
+  // ===============================
+  // CARGAR TODAS
+  // ===============================
+  load() {
 
+    this.loading.set(true); // 🔥 activar loading
+
+    this.http.get<Entidad[]>(this.url)
+      .subscribe({
+        next: (data) => {
+          this.entidades.set(data);
+          this.loading.set(false); // 🔥 desactivar loading
+        },
+        error: (err) => {
+          console.error('Error cargando entidades', err);
+          this.loading.set(false); // 🔥 desactivar también en error
+        }
+      });
   }
-  delete(entidad: Entidad): void {
-    this.http.delete<Entidad>(`${this.url}entidades/${entidad.id}`).subscribe({
-      next: (res) => {
-        this.refresh();
-      },
-      error: (error) => {
-        console.error('Error al eliminar la entidad:', error);
-      }
-    });
+
+  add(entidad: Entidad) {
+    return this.http.post<Entidad>(this.url, entidad);
   }
+
+  update(entidad: Entidad) {
+    return this.http.put(`${this.url}/${entidad.id}`, entidad);
+  }
+
+  delete(entidad: Entidad) {
+    return this.http.delete(`${this.url}/${entidad.id}`);
+  }
+
+  deleteMultiple(ids: number[]) {
+    return this.http.post(`${this.url}/delete-multiple`, { ids });
+  }
+
 }

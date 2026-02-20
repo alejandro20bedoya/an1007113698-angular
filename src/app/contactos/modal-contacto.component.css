@@ -1,0 +1,65 @@
+/* Wrapper de formulario con espaciado */
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 0.5rem;
+}
+
+/* Cada grupo de label + input */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Labels con estilo moderno */
+.form-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    color: #495057;
+}
+
+/* Inputs estilo Bootstrap */
+.form-group input {
+    border-radius: 8px !important;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #ced4da;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+/* Focus dinámico */
+.form-group input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+}
+
+/* Footer alineado a la derecha */
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.7rem;
+}
+
+/* Estilo del dialog */
+:host ::ng-deep .custom-dialog .p-dialog {
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+/* Header moderno */
+:host ::ng-deep .custom-dialog .p-dialog-header {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Botones con colores más elegantes */
+:host ::ng-deep .custom-dialog .p-button-success {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+:host ::ng-deep .custom-dialog .p-button-success:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
+}

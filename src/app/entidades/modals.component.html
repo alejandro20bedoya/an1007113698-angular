@@ -1,0 +1,56 @@
+<p-dialog
+    [header]="isEdit ? 'Editar Entidad' : 'Nueva Entidad'"
+    [(visible)]="visible"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '520px' }"
+    styleClass="custom-dialog"
+    (onHide)="onHide()">
+
+    <div class="form-wrapper">
+
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" pInputText [(ngModel)]="entidad.nombrec" />
+        </div>
+
+        <div class="form-group">
+            <label>NIT</label>
+            <input type="text" pInputText [(ngModel)]="entidad.nit" />
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" pInputText [(ngModel)]="entidad.telefono" />
+        </div>
+
+        <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" pInputText [(ngModel)]="entidad.direccion" />
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button
+                pButton
+                label="Cancelar"
+                icon="pi pi-times"
+                class="p-button-outlined p-button-secondary"
+                (click)="onHide()">
+            </button>
+
+            <button
+                pButton
+                [label]="isEdit ? 'Actualizar' : 'Guardar'"
+                icon="pi pi-check"
+                class="p-button-primary"
+                (click)="onSave()">
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

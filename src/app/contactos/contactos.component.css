@@ -1,0 +1,26 @@
+/* Contenedor del buscador */
+.p-input-icon-left {
+    width: 250px;
+}
+
+/* Input */
+.buscador {
+    width: 100%;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 14px;
+    padding-left: 2.2rem;
+    /* espacio correcto para el icono */
+    transition: all 0.2s ease;
+}
+
+/* Focus elegante */
+.buscador:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* Placeholder */
+.buscador::placeholder {
+    color: #9ca3af;
+}
