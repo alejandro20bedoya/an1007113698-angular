@@ -6,9 +6,13 @@
       <p-button severity="success" label="Nueva" styleClass="mr-2" (onClick)="openNew()">
         <i class="bi bi-plus-circle-dotted mr-2"></i>
       </p-button>
+      <p-button label="Eliminar" severity="danger" [disabled]="!selectedContactos.length" styleClass="mr-2"
+        (onClick)="deleteSelected()">
+        <ng-template pTemplate="icon">
+          <i class="bi bi-trash3 mr-2"></i>
+        </ng-template>
+      </p-button>
 
-      <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [disabled]="!selectedContactos.length"
-        styleClass="mr-2" (onClick)="deleteSelected()"></p-button>
 
       <button pButton label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" styleClass="mr-2"
         (click)="volverEntidades()"></button>

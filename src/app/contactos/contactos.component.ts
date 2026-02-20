@@ -1,3 +1,4 @@
+// herramientas 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -7,15 +8,14 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { HttpClient } from '@angular/common/http';
-// import { ActivatedRoute } from '@angular/router';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalContactoComponent } from './modal-contacto.component';
 import { forkJoin } from 'rxjs';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'; // instalamos sweetalert para las alertas mas dinamicas y interactivas
 import { ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 
-
+// Decorador que define el componente, su HTML, CSS, dependencias y servicios
 @Component({
   selector: 'app-contactos',
   standalone: true,
@@ -32,6 +32,8 @@ import { Table } from 'primeng/table';
   styleUrls: ['./contactos.component.css'],
   providers: [MessageService]
 })
+
+// controlador de contactos aca hacemos la logica de los contactos 
 export class ContactosComponent implements OnInit {
 
   contactos: any[] = [];
@@ -55,9 +57,7 @@ export class ContactosComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
 
-  // =============================
   // CARGAR CONTACTOS
-  // =============================
   loadContactos() {
     const url = this.entidadId
       ? `${this.baseUrl}/entidades/${this.entidadId}/contactos`
@@ -71,17 +71,13 @@ export class ContactosComponent implements OnInit {
     });
   }
 
-  // =============================
   // VOLVER A ENTIDADES
-  // =============================
   volverEntidades() {
     this.router.navigate(['/entidades']);
   }
 
 
-  // =============================
   // ABRIR NUEVO
-  // =============================
   openNew() {
     this.contacto = { entidad_id: this.entidadId ?? null };
     this.contactoDialog = true;
@@ -93,17 +89,13 @@ export class ContactosComponent implements OnInit {
   }
 
 
-  // =============================
   // EDITAR
-  // =============================
   edit(contacto: any) {
     this.contacto = { ...contacto };
     this.contactoDialog = true;
   }
 
-  // =============================
   // ELIMINAR UNO
-  // =============================
   delete(contacto: any) {
 
     if (!contacto.id) return;
@@ -142,9 +134,7 @@ export class ContactosComponent implements OnInit {
     });
   }
 
-  // =============================
   // ELIMINAR MÚLTIPLES
-  // =============================
   deleteSelected() {
 
     if (!this.selectedContactos.length) return;
@@ -187,9 +177,7 @@ export class ContactosComponent implements OnInit {
     });
   }
 
-  // =============================
   // GUARDAR / ACTUALIZAR
-  // =============================
   saveContactoHandler(contacto: any) {
 
     const esEdicion = !!contacto.id;

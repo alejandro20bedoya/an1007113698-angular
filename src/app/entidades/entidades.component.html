@@ -45,16 +45,16 @@
                     <p-tableHeaderCheckbox />
                 </th>
                 <th pSortableColumn="nombrec" style="min-width:15rem">
-                    Nombre 
+                    Nombre
                 </th>
                 <th pSortableColumn="nit">
                     Nit
                 </th>
                 <th pSortableColumn="telefono">
-                    Teléfono 
+                    Teléfono
                 </th>
                 <th pSortableColumn="direccion" style="min-width:10rem">
-                    Dirección 
+                    Dirección
                 </th>
                 <th>
                     Opciones
@@ -72,13 +72,22 @@
                 <td>{{ entidad.telefono }}</td>
                 <td>{{ entidad.direccion }}</td>
                 <td>
-                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
-                        (onClick)="edit(entidad)" />
-                    <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
-                        (onClick)="deleteEntidad(entidad)" />
-                    <p-button icon="pi pi-users" severity="info" [rounded]="true" [outlined]="true"
-                        (onClick)="verContactos(entidad)">
+
+                    <!-- Botón Editar -->
+                    <p-button icon="bi bi-pencil" severity="success" [rounded]="true" [outlined]="true"
+                        class="p-button-icon-only mr-2" (onClick)="edit(entidad)">
                     </p-button>
+
+                    <!-- Botón Eliminar -->
+                    <p-button icon="bi bi-trash3" severity="danger" [rounded]="true" [outlined]="true"
+                        class="p-button-icon-only mr-2" (onClick)="deleteEntidad(entidad)">
+                    </p-button>
+
+                    <!-- Botón Ver Contactos -->
+                    <p-button icon="bi bi-people" severity="info" [rounded]="true" [outlined]="true"
+                        class="p-button-icon-only" (onClick)="verContactos(entidad)">
+                    </p-button>
+
                 </td>
             </tr>
         </ng-template>

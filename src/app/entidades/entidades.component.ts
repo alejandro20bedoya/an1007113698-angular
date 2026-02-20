@@ -1,19 +1,19 @@
+// Componente que maneja la interfaz de Entidades: lista, filtros, modales y servicios
 import { Component, computed, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TableModule, Table } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-
 import { EntidadesService } from './services/entidades.service';
 import { Entidad } from './interfaces/entidad';
-import { ModalsComponent } from './modals.component';
+import { ModalsComponent } from './modals.component'; // importamos el modal que creamos
 
+// Decorador que define el componente, su HTML, CSS, dependencias y servicios
 @Component({
   selector: 'app-entidades',
   standalone: true,
@@ -30,6 +30,9 @@ import { ModalsComponent } from './modals.component';
   styleUrls: ['./entidades.component.css'],
   providers: [MessageService]
 })
+
+// esta es la logica de todo el crud de entidades 
+// es como un constructor 
 export class EntidadesComponent {
 
   // 🔥 REFERENCIA A LA TABLA
@@ -52,7 +55,7 @@ export class EntidadesComponent {
   entidadDialog = false;
   entidad: Entidad = {} as Entidad;
 
-  // 🔥 BUSCADOR GLOBAL// 🔥 BUSCADOR GLOBAL
+  //  BUSCADOR GLOBAL//  BUSCADOR GLOBAL
   applyFilter(event: Event) {
     const input = event.target as HTMLInputElement;
     this.dt.filterGlobal(input.value, 'contains');
@@ -60,25 +63,21 @@ export class EntidadesComponent {
 
 
 
-  // =============================
+  
   // ABRIR MODAL NUEVO
-  // =============================
+  
   openNew() {
     this.entidad = {} as Entidad;
     this.entidadDialog = true;
   }
 
-  // =============================
   // EDITAR
-  // =============================
   edit(entidad: Entidad) {
     this.entidad = { ...entidad };
     this.entidadDialog = true;
   }
 
-  // =============================
   // GUARDAR / ACTUALIZAR
-  // =============================
   save(entidad: Entidad) {
 
     const esEdicion = !!entidad.id;
@@ -137,9 +136,7 @@ export class EntidadesComponent {
     });
   }
 
-  // =============================
   // ELIMINAR MÚLTIPLES
-  // =============================
   deleteSelected() {
 
     if (!this.selectedEntidades.length) return;
@@ -173,9 +170,7 @@ export class EntidadesComponent {
     });
   }
 
-  // =============================
   // ELIMINAR UNA
-  // =============================
   deleteEntidad(entidad: Entidad) {
 
     Swal.fire({
@@ -207,16 +202,12 @@ export class EntidadesComponent {
     });
   }
 
-  // =============================
   // CERRAR MODAL
-  // =============================
   hideDialog() {
     this.entidadDialog = false;
   }
 
-  // =============================
   // NAVEGACIÓN
-  // =============================
   verContactos(entidad: Entidad) {
     this.router.navigate(['/contactos', entidad.id]);
   }
