@@ -52,9 +52,7 @@ export class ContactosComponent implements OnInit {
     this.loadContactos();
   }
 
-  // ==========================
   // Getter de contactos filtrados
-  // ==========================
   get contactosFiltrados(): any[] {
     if (!this.searchText) return this.contactos.slice();
     const text = this.searchText.toLowerCase().trim();
@@ -69,9 +67,7 @@ export class ContactosComponent implements OnInit {
     );
   }
 
-  // ==========================
   // Load y demás métodos existentes
-  // ==========================
   loadContactos() {
     const url = this.entidadId
       ? `${this.baseUrl}/entidades/${this.entidadId}/contactos`

@@ -48,16 +48,12 @@ export class EntidadesComponent {
 
   isEditMode = false;
 
-  // ===============================
   // GET ENTIDADES PARA LA TABLA
-  // ===============================
   get entidades(): Entidad[] {
     return this.entidadesService.entidades().slice(); // slice fuerza nueva referencia para PrimeNG
   }
 
-  // ===============================
   // FILTRO GLOBAL
-  // ===============================
   // Texto del buscador
   searchText = '';
 
@@ -78,9 +74,7 @@ export class EntidadesComponent {
     });
   }
 
-  // ===============================
   // ABRIR MODAL NUEVO
-  // ===============================
   openNew() {
     this.isEditMode = false;
     this.entidad = {
@@ -94,18 +88,14 @@ export class EntidadesComponent {
     this.entidadDialog = true;
   }
 
-  // ===============================
   // ABRIR MODAL PARA EDITAR
-  // ===============================
   edit(entidad: Entidad) {
     this.isEditMode = true;
     this.entidad = { ...entidad };
     this.entidadDialog = true;
   }
 
-  // ===============================
   // GUARDAR O ACTUALIZAR DESDE EL MODAL
-  // ===============================
   handleSave(entidad: Entidad) {
     const esEdicion = this.isEditMode;
 
@@ -162,9 +152,7 @@ export class EntidadesComponent {
     });
   }
 
-  // ===============================
   // ELIMINAR MÚLTIPLES
-  // ===============================
   deleteSelected() {
     if (!this.selectedEntidades.length) return;
     const ids = this.selectedEntidades.map(e => e.id!);
@@ -196,9 +184,7 @@ export class EntidadesComponent {
     });
   }
 
-  // =============================
   // ELIMINAR UNA
-  // =============================
   deleteEntidad(entidad: Entidad) {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -225,16 +211,12 @@ export class EntidadesComponent {
     });
   }
 
-  // =============================
   // CERRAR MODAL
-  // =============================
   hideDialog() {
     this.entidadDialog = false;
   }
 
-  // =============================
   // NAVEGACIÓN
-  // =============================
   verContactos(entidad: Entidad) {
     this.router.navigate(['/contactos', entidad.id]);
   }
