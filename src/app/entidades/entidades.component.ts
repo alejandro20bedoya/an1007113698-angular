@@ -126,7 +126,21 @@ export class EntidadesComponent {
         },
         error: (err) => {
           console.error(err);
-          Swal.fire({ icon: 'error', title: 'Error', text: 'Ocurrió un problema en el servidor.' });
+
+          // Si Laravel devuelve error de validación 422
+          if (err.status === 422 && err.error.errors) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Datos duplicados',
+              text: 'El nombre, NIT o correo ya existen. Ingresa otros.'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Ocurrió un problema en el servidor.'
+            });
+          }
         }
       });
     });

@@ -154,27 +154,23 @@ export class ContactosComponent implements OnInit {
       error: (err) => {
         this.contactoDialog = false;
 
+        // 🔹 Validación de backend
         if (err.status === 422) {
           const errors = err.error.errors;
           const messages: string[] = [];
 
-          // 🔹 Solo mostramos errores si el campo fue modificado
-          if (errors.correo && contacto.correo !== undefined) {
-            messages.push(...errors.correo);
-          }
-          if (errors.identificacion && contacto.identificacion !== undefined) {
-            messages.push(...errors.identificacion);
-          }
-
-          for (const key of Object.keys(errors)) {
-            if (key !== 'correo' && key !== 'identificacion') {
+          // Recorrer todos los campos que devuelven error
+          if (errors) {
+            for (const key of Object.keys(errors)) {
               messages.push(...errors[key]);
             }
           }
 
-          if (messages.length > 0) {
-            Swal.fire('Errores de validación', messages.join('\n'), 'error');
-          }
+          // Mostrar alerta con todos los mensajes
+          Swal.fire('Errores de validación', messages.join('\n'), 'warning');
+        } else if (err.status === 500) {
+          // Errores del servidor
+          Swal.fire('Error', err.error?.message || 'Ocurrió un problema en el servidor.', 'error');
         } else {
           Swal.fire(
             'Error',
