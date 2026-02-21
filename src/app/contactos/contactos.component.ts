@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModalContactoComponent } from './modal-contacto.component';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; 
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -16,6 +17,7 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule, // <-- necesario para [(ngModel)]
     TableModule,
     CardModule,
     ButtonModule,
@@ -34,6 +36,9 @@ export class ContactosComponent implements OnInit {
   contacto: any = {};
   entidadId?: number;
 
+  // Buscador potente
+  searchText = '';
+
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -47,6 +52,26 @@ export class ContactosComponent implements OnInit {
     this.loadContactos();
   }
 
+  // ==========================
+  // Getter de contactos filtrados
+  // ==========================
+  get contactosFiltrados(): any[] {
+    if (!this.searchText) return this.contactos.slice();
+    const text = this.searchText.toLowerCase().trim();
+
+    return this.contactos.filter(c =>
+      (c.nombre?.toLowerCase().includes(text) ?? false) ||
+      (c.identificacion?.toLowerCase().includes(text) ?? false) ||
+      (c.correo?.toLowerCase().includes(text) ?? false) ||
+      (c.telefono?.toLowerCase().includes(text) ?? false) ||
+      (c.cargo?.toLowerCase().includes(text) ?? false) ||
+      (c.entidad?.nombrec?.toLowerCase().includes(text) ?? false)
+    );
+  }
+
+  // ==========================
+  // Load y demás métodos existentes
+  // ==========================
   loadContactos() {
     const url = this.entidadId
       ? `${this.baseUrl}/entidades/${this.entidadId}/contactos`
@@ -71,7 +96,6 @@ export class ContactosComponent implements OnInit {
   }
 
   edit(contacto: any) {
-    // 🔹 Solo copiamos los datos actuales
     this.contacto = { ...contacto };
     this.contactoDialog = true;
   }
@@ -86,9 +110,8 @@ export class ContactosComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(result => {
       if (!result.isConfirmed) return;
-
       this.http.delete(`${this.baseUrl}/contactos/${contacto.id}`).subscribe({
         next: () => {
           this.loadContactos();
@@ -109,7 +132,7 @@ export class ContactosComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(result => {
       if (!result.isConfirmed) return;
 
       const requests = this.selectedContactos.map(c =>
@@ -128,8 +151,6 @@ export class ContactosComponent implements OnInit {
   }
 
   saveContactoHandler(contacto: any) {
-    console.log('Enviando contacto:', contacto);
-
     const esEdicion = !!contacto.id;
 
     const action$ = esEdicion
@@ -140,55 +161,13 @@ export class ContactosComponent implements OnInit {
       next: () => {
         this.loadContactos();
         this.contactoDialog = false;
-
-        setTimeout(() => {
-          Swal.fire(
-            esEdicion ? 'Actualizado!' : 'Creado!',
-            esEdicion
-              ? 'Contacto actualizado correctamente'
-              : 'Contacto creado correctamente',
-            'success'
-          );
-        }, 100);
+        Swal.fire(esEdicion ? 'Actualizado!' : 'Creado!', esEdicion ? 'Contacto actualizado correctamente' : 'Contacto creado correctamente', 'success');
       },
-      error: (err) => {
+      error: err => {
         this.contactoDialog = false;
-
-        // 🔹 Validación de backend
-        if (err.status === 422) {
-          const errors = err.error.errors;
-          const messages: string[] = [];
-
-          // Recorrer todos los campos que devuelven error
-          if (errors) {
-            for (const key of Object.keys(errors)) {
-              messages.push(...errors[key]);
-            }
-          }
-
-          // Mostrar alerta con todos los mensajes
-          Swal.fire('Errores de validación', messages.join('\n'), 'warning');
-        } else if (err.status === 500) {
-          // Errores del servidor
-          Swal.fire('Error', err.error?.message || 'Ocurrió un problema en el servidor.', 'error');
-        } else {
-          Swal.fire(
-            'Error',
-            esEdicion
-              ? 'No se pudo actualizar el contacto'
-              : 'No se pudo crear el contacto',
-            'error'
-          );
-        }
+        Swal.fire('Error', 'Ocurrió un problema creando o actualizando el contacto', 'error');
       }
     });
-  }
-
-  applyFilter(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (this.dt) {
-      this.dt.filterGlobal(input.value, 'contains');
-    }
   }
 
   volverEntidades() {

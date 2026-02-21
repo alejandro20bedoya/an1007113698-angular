@@ -2,7 +2,7 @@ import { Component, computed, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-
+import { FormsModule } from '@angular/forms'; 
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -20,6 +20,7 @@ import { ModalsComponent } from './modals.component';
   imports: [
     CommonModule,
     CardModule,
+    FormsModule,
     ButtonModule,
     TableModule,
     ToolbarModule,
@@ -57,9 +58,24 @@ export class EntidadesComponent {
   // ===============================
   // FILTRO GLOBAL
   // ===============================
-  applyFilter(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.dt.filterGlobal(input.value, 'contains');
+  // Texto del buscador
+  searchText = '';
+
+  // Getter que filtra por todos los campos
+  get entidadesFiltradas(): Entidad[] {
+    if (!this.searchText) return this.entidadesService.entidades().slice();
+
+    const text = this.searchText.toLowerCase().trim();
+
+    return this.entidadesService.entidades().filter(e => {
+      return (
+        (e.nombrec?.toLowerCase().includes(text) ?? false) ||
+        (e.nit?.toLowerCase().includes(text) ?? false) ||
+        (e.email?.toLowerCase().includes(text) ?? false) ||
+        (e.direccion?.toLowerCase().includes(text) ?? false) ||
+        (e.telefono?.toLowerCase().includes(text) ?? false)
+      );
+    });
   }
 
   // ===============================
