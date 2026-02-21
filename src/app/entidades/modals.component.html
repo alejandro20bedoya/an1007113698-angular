@@ -1,56 +1,38 @@
-<p-dialog
-    [header]="isEdit ? 'Editar Entidad' : 'Nueva Entidad'"
-    [(visible)]="visible"
-    [modal]="true"
-    [closable]="true"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '520px' }"
-    styleClass="custom-dialog"
-    (onHide)="onHide()">
+<p-dialog [(visible)]="visible" modal="true" [closable]="true"
+  header="{{ entidadLocal.id ? 'Editar Entidad' : 'Nueva Entidad' }}"
+  (onHide)="onHide()" [style]="{ width: '450px' }">
 
-    <div class="form-wrapper">
-
-        <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" pInputText [(ngModel)]="entidad.nombrec" />
-        </div>
-
-        <div class="form-group">
-            <label>NIT</label>
-            <input type="text" pInputText [(ngModel)]="entidad.nit" />
-        </div>
-
-        <div class="form-group">
-            <label>Teléfono</label>
-            <input type="text" pInputText [(ngModel)]="entidad.telefono" />
-        </div>
-
-        <div class="form-group">
-            <label>Dirección</label>
-            <input type="text" pInputText [(ngModel)]="entidad.direccion" />
-        </div>
-
+  <div class="p-fluid formgrid grid">
+    <div class="field col-12">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" type="text" pInputText [(ngModel)]="entidadLocal.nombrec" required />
     </div>
 
-    <ng-template pTemplate="footer">
-        <div class="dialog-footer">
-            <button
-                pButton
-                label="Cancelar"
-                icon="pi pi-times"
-                class="p-button-outlined p-button-secondary"
-                (click)="onHide()">
-            </button>
+    <div class="field col-12">
+      <label for="nit">NIT</label>
+      <input id="nit" type="text" pInputText [(ngModel)]="entidadLocal.nit" required />
+    </div>
 
-            <button
-                pButton
-                [label]="isEdit ? 'Actualizar' : 'Guardar'"
-                icon="pi pi-check"
-                class="p-button-primary"
-                (click)="onSave()">
-            </button>
-        </div>
-    </ng-template>
+    <div class="field col-12">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" type="text" pInputText [(ngModel)]="entidadLocal.telefono" />
+    </div>
+
+    <div class="field col-12">
+      <label for="direccion">Dirección</label>
+      <input id="direccion" type="text" pInputText [(ngModel)]="entidadLocal.direccion" />
+    </div>
+
+    <div class="field col-12">
+      <label for="email">Email</label>
+      <input id="email" type="email" pInputText [(ngModel)]="entidadLocal.email" />
+    </div>
+  </div>
+
+  <p-footer>
+    <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (onClick)="onHide()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" (onClick)="onSave()"
+      [disabled]="!entidadLocal.nombrec || !entidadLocal.nit"></p-button>
+  </p-footer>
 
 </p-dialog>

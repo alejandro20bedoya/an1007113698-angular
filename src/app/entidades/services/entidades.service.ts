@@ -1,56 +1,74 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Entidad } from '../interfaces/entidad';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntidadesService {
-
   private http = inject(HttpClient);
   private url = 'http://127.0.0.1:8000/api/entidades';
 
+  // Signal para almacenar entidades
   entidades = signal<Entidad[]>([]);
-  loading = signal<boolean>(false); // 🔥 AGREGAR ESTO
+  loading = signal<boolean>(false);
 
   constructor() {
     this.load();
   }
 
   // ===============================
-  // CARGAR TODAS
+  // CARGAR TODAS LAS ENTIDADES
   // ===============================
   load() {
-
-    this.loading.set(true); // 🔥 activar loading
+    this.loading.set(true);
 
     this.http.get<Entidad[]>(this.url)
       .subscribe({
-        next: (data) => {
+        next: (data: Entidad[]) => {
           this.entidades.set(data);
-          this.loading.set(false); // 🔥 desactivar loading
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error cargando entidades', err);
-          this.loading.set(false); // 🔥 desactivar también en error
+          this.loading.set(false);
         }
       });
   }
 
-  add(entidad: Entidad) {
+  // ===============================
+  // AGREGAR ENTIDAD
+  // ===============================
+  add(entidad: Entidad): Observable<Entidad> {
     return this.http.post<Entidad>(this.url, entidad);
   }
 
-  update(entidad: Entidad) {
-    return this.http.put(`${this.url}/${entidad.id}`, entidad);
+  // ===============================
+  // ACTUALIZAR ENTIDAD
+  // ===============================
+  update(entidad: Entidad): Observable<Entidad> {
+    return this.http.put<Entidad>(`${this.url}/${entidad.id}`, entidad);
   }
 
-  delete(entidad: Entidad) {
-    return this.http.delete(`${this.url}/${entidad.id}`);
+  // ===============================
+  // ELIMINAR ENTIDAD
+  // ===============================
+  delete(entidad: Entidad): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${entidad.id}`);
   }
 
-  deleteMultiple(ids: number[]) {
-    return this.http.post(`${this.url}/delete-multiple`, { ids });
+  // ===============================
+  // ELIMINAR MÚLTIPLES ENTIDADES
+  // ===============================
+  deleteMultiple(ids: number[]): Observable<void> {
+    return this.http.post<void>(`${this.url}/delete-multiple`, { ids });
   }
 
+  // ===============================
+  // ESTADO DE CARGA
+  // ===============================
+  loadingState(): boolean {
+    return this.loading();
+  }
 }

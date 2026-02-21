@@ -1,21 +1,36 @@
-<p-dialog header="{{ contacto?.id ? 'Editar Contacto' : 'Nuevo Contacto' }}" [(visible)]="visible" [modal]="true"
-    [closable]="true" (onHide)="hide()" [style]="{width: '450px'}">
+<p-dialog header="{{ contacto?.id ? 'Editar Contacto' : 'Nuevo Contacto' }}"
+          [(visible)]="visible"
+          [modal]="true"
+          [closable]="true"
+          (onHide)="hide()"
+          [style]="{width: '450px'}">
+
     <div class="form-wrapper">
         <div class="form-group">
             <label>Entidad</label>
-            <p-dropdown [options]="entidades" optionLabel="nombrec" optionValue="id" [(ngModel)]="selectedEntidad"
-                placeholder="Seleccione una entidad">
+            <p-dropdown [options]="entidades" 
+                        optionLabel="nombrec" 
+                        optionValue="id" 
+                        [(ngModel)]="selectedEntidad"
+                        placeholder="Seleccione una entidad">
             </p-dropdown>
         </div>
+
         <div class="form-group">
             <label>Nombre</label>
             <input type="text" pInputText [(ngModel)]="contacto.nombre">
         </div>
 
         <div class="form-group">
+            <label>Identificación</label>
+            <input type="text" pInputText [(ngModel)]="contacto.identificacion">
+        </div>
+
+        <div class="form-group">
             <label>Correo</label>
             <input type="email" pInputText [(ngModel)]="contacto.correo">
         </div>
+
         <div class="form-group">
             <label>Teléfono</label>
             <input type="text" pInputText [(ngModel)]="contacto.telefono">
@@ -28,9 +43,13 @@
     </div>
 
     <p-footer class="dialog-footer">
-        <p-button label="Cancelar" icon="pi pi-times" (onClick)="hide()" class="p-button-text"></p-button>
-         <!--  Eso evita incluso que presione guardar sin entidad. -->
-        <button pButton label="Guardar" (click)="save()" [disabled]="!selectedEntidad">
+        <p-button label="Cancelar" icon="pi pi-times" 
+                  (onClick)="hide()" class="p-button-text">
+        </p-button>
+
+        <button pButton label="Guardar" 
+                (click)="save()" 
+                [disabled]="!selectedEntidad">
         </button>
     </p-footer>
 </p-dialog>

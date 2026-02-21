@@ -1,19 +1,19 @@
-// Componente que maneja la interfaz de Entidades: lista, filtros, modales y servicios
 import { Component, computed, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TableModule, Table } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+
 import { EntidadesService } from './services/entidades.service';
 import { Entidad } from './interfaces/entidad';
-import { ModalsComponent } from './modals.component'; // importamos el modal que creamos
+import { ModalsComponent } from './modals.component';
 
-// Decorador que define el componente, su HTML, CSS, dependencias y servicios
 @Component({
   selector: 'app-entidades',
   standalone: true,
@@ -30,22 +30,12 @@ import { ModalsComponent } from './modals.component'; // importamos el modal que
   styleUrls: ['./entidades.component.css'],
   providers: [MessageService]
 })
-
-// esta es la logica de todo el crud de entidades 
-// es como un constructor 
 export class EntidadesComponent {
 
-  // 🔥 REFERENCIA A LA TABLA
   @ViewChild('dt') dt!: Table;
 
-  // Método para filtros individuales
-  applyColumnFilter(value: string, field: string) {
-    this.dt.filter(value, field, 'contains');
-  }
-
-
-  public entidadesService = inject(EntidadesService);
   private router = inject(Router);
+  public entidadesService = inject(EntidadesService);
   private messageService = inject(MessageService);
 
   total = computed(() => this.entidadesService.entidades().length);
@@ -55,52 +45,60 @@ export class EntidadesComponent {
   entidadDialog = false;
   entidad: Entidad = {} as Entidad;
 
-  //  BUSCADOR GLOBAL//  BUSCADOR GLOBAL
+  isEditMode = false;
+
+  // ===============================
+  // GET ENTIDADES PARA LA TABLA
+  // ===============================
+  get entidades(): Entidad[] {
+    return this.entidadesService.entidades().slice(); // slice fuerza nueva referencia para PrimeNG
+  }
+
+  // ===============================
+  // FILTRO GLOBAL
+  // ===============================
   applyFilter(event: Event) {
     const input = event.target as HTMLInputElement;
     this.dt.filterGlobal(input.value, 'contains');
   }
 
-
-
-  
+  // ===============================
   // ABRIR MODAL NUEVO
-  
+  // ===============================
   openNew() {
-    this.entidad = {} as Entidad;
+    this.isEditMode = false;
+    this.entidad = {
+      id: undefined,
+      nombrec: '',
+      nit: '',
+      direccion: '',
+      telefono: '',
+      email: ''
+    };
     this.entidadDialog = true;
   }
 
-  // EDITAR
+  // ===============================
+  // ABRIR MODAL PARA EDITAR
+  // ===============================
   edit(entidad: Entidad) {
+    this.isEditMode = true;
     this.entidad = { ...entidad };
     this.entidadDialog = true;
   }
 
-  // GUARDAR / ACTUALIZAR
-  save(entidad: Entidad) {
-
-    const esEdicion = !!entidad.id;
-
-    if (!entidad.nombrec || !entidad.nit) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Campos obligatorios',
-        text: 'Nombre y NIT son obligatorios'
-      });
-      return;
-    }
+  // ===============================
+  // GUARDAR O ACTUALIZAR DESDE EL MODAL
+  // ===============================
+  handleSave(entidad: Entidad) {
+    const esEdicion = this.isEditMode;
 
     Swal.fire({
-      title: esEdicion ? '¿Estás seguro?' : '¿Deseas guardar?',
-      text: esEdicion
-        ? 'La entidad será actualizada'
-        : 'La entidad será registrada',
+      title: esEdicion ? '¿Actualizar entidad?' : '¿Guardar entidad?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: esEdicion ? 'Sí, actualizar' : 'Sí, guardar'
-    }).then((result) => {
-
+    }).then(result => {
       if (!result.isConfirmed) return;
 
       const request = esEdicion
@@ -108,71 +106,70 @@ export class EntidadesComponent {
         : this.entidadesService.add(entidad);
 
       request.subscribe({
-        next: () => {
-
-          this.entidadesService.load();
-
-          Swal.fire(
-            esEdicion ? 'Actualizado!' : 'Guardado!',
-            esEdicion
-              ? 'Entidad actualizada correctamente'
-              : 'Entidad creada correctamente',
-            'success'
-          );
-
+        next: (respEntidad: Entidad) => {
           this.entidadDialog = false;
-        },
-        error: (error) => {
-          if (error.status === 422) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error de validación',
-              text: 'Revisa los campos obligatorios'
-            });
+
+          if (esEdicion) {
+            const index = this.entidadesService.entidades().findIndex(e => e.id === respEntidad.id);
+            if (index !== -1) this.entidadesService.entidades()[index] = respEntidad;
+          } else {
+            this.entidadesService.entidades().push(respEntidad);
           }
+
+          if (this.dt) this.dt.reset();
+
+          Swal.fire({
+            icon: 'success',
+            title: esEdicion ? 'Actualizado!' : 'Guardado!',
+            text: esEdicion ? 'Entidad actualizada correctamente' : 'Entidad creada correctamente'
+          });
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({ icon: 'error', title: 'Error', text: 'Ocurrió un problema en el servidor.' });
         }
       });
-
     });
   }
 
+  // ===============================
   // ELIMINAR MÚLTIPLES
+  // ===============================
   deleteSelected() {
-
     if (!this.selectedEntidades.length) return;
-
     const ids = this.selectedEntidades.map(e => e.id!);
 
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: `Se eliminarán ${ids.length} entidad(es)`,
+      title: '¿Eliminar seleccionadas?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar'
-    }).then((result) => {
-
+    }).then(result => {
       if (!result.isConfirmed) return;
 
       this.entidadesService.deleteMultiple(ids).subscribe({
         next: () => {
-
-          this.entidadesService.load();
+          this.selectedEntidades.forEach(ent => {
+            const index = this.entidadesService.entidades().findIndex(e => e.id === ent.id);
+            if (index !== -1) this.entidadesService.entidades().splice(index, 1);
+          });
           this.selectedEntidades = [];
+          if (this.dt) this.dt.reset();
 
-          Swal.fire(
-            'Eliminadas!',
-            'Las entidades fueron eliminadas correctamente.',
-            'success'
-          );
+          Swal.fire('Eliminadas!', 'Entidades eliminadas correctamente.', 'success');
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron eliminar las entidades.' });
         }
       });
-
     });
   }
 
+  // =============================
   // ELIMINAR UNA
+  // =============================
   deleteEntidad(entidad: Entidad) {
-
     Swal.fire({
       title: '¿Estás seguro?',
       text: `Se eliminará la entidad "${entidad.nombrec}"`,
@@ -180,12 +177,10 @@ export class EntidadesComponent {
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar'
     }).then((result) => {
-
       if (!result.isConfirmed) return;
 
       this.entidadesService.delete(entidad).subscribe({
         next: () => {
-
           this.entidadesService.load();
 
           Swal.fire({
@@ -195,19 +190,21 @@ export class EntidadesComponent {
             timer: 1500,
             showConfirmButton: false
           });
-
         }
       });
-
     });
   }
 
+  // =============================
   // CERRAR MODAL
+  // =============================
   hideDialog() {
     this.entidadDialog = false;
   }
 
+  // =============================
   // NAVEGACIÓN
+  // =============================
   verContactos(entidad: Entidad) {
     this.router.navigate(['/contactos', entidad.id]);
   }

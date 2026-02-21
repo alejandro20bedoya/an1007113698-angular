@@ -1,118 +1,121 @@
-// Importaciones de Angular necesarias
 import {
-    Component,
-    OnInit,
-    OnChanges,
-    SimpleChanges,
-    Input,
-    Output,
-    EventEmitter,
-    inject
+  Component,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  Input,
+  Output,
+  EventEmitter,
+  inject
 } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { DropdownModule } from 'primeng/dropdown';
+import { HttpClient } from '@angular/common/http';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
-// Importaciones de PrimeNG para la interfaz
-import { DialogModule } from 'primeng/dialog';       // Ventana modal
-import { ButtonModule } from 'primeng/button';       // Botones estilizados
-import { InputTextModule } from 'primeng/inputtext'; // Campos de texto
-import { DropdownModule } from 'primeng/dropdown';   // Dropdown para seleccionar entidades
-
-import { HttpClient } from '@angular/common/http';   // Para hacer peticiones HTTP
-import Swal from 'sweetalert2';                     // Para alertas bonitas
-
-
-// Decorador que define el componente
 @Component({
-    selector: 'app-modal-contacto', // nombre del componente en HTML
-    standalone: true,               // componente independiente, no necesita módulo
-    imports: [                      // módulos necesarios para usar en este modal
-        CommonModule,
-        FormsModule,
-        DialogModule,
-        ButtonModule,
-        InputTextModule,
-        DropdownModule
-    ],
-    templateUrl: './modal-contacto.component.html', // HTML del modal
-    styleUrls: ['./modal-contacto.component.css']   // CSS del modal
+  selector: 'app-modal-contacto',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    DialogModule,
+    ButtonModule,
+    InputTextModule,
+    DropdownModule
+  ],
+  templateUrl: './modal-contacto.component.html',
+  styleUrls: ['./modal-contacto.component.css']
 })
 export class ModalContactoComponent implements OnInit, OnChanges {
 
-    // 🔹 Controla si el modal es visible
-    @Input() visible: boolean = false;
-    @Output() visibleChange = new EventEmitter<boolean>();
+  @Input() visible: boolean = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
 
-    // 🔹 Contacto que se va a crear o editar
-    @Input() contacto: any = {};
-    @Output() saveContacto = new EventEmitter<any>();
+  @Input() contacto: any = {};
+  @Output() saveContacto = new EventEmitter<any>();
 
-    // 🔹 Lista de entidades para el dropdown
-    entidades: any[] = [];
-    selectedEntidad: any = null;
+  entidades: any[] = [];
+  selectedEntidad: number | null = null;
 
-    // 🔹 Servicio HTTP para cargar entidades
-    private http = inject(HttpClient);
+  private http = inject(HttpClient);
 
+  ngOnInit() {
+    this.loadEntidades();
+  }
 
-    // Se ejecuta al iniciar el componente
-    ngOnInit() {
-        this.loadEntidades(); // carga la lista de entidades desde el backend
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['contacto'] && this.contacto) {
+      this.selectedEntidad = this.contacto.entidad_id ?? null;
+    }
+  }
+
+  loadEntidades() {
+    this.http.get<any[]>('http://localhost:8000/api/entidades')
+      .subscribe({
+        next: data => this.entidades = data,
+        error: () => this.showAlert('error', 'Error', 'No se pudieron cargar las entidades')
+      });
+  }
+
+  save() {
+
+    if (!this.selectedEntidad) {
+      this.showAlert('warning', 'Entidad requerida', 'Debes seleccionar una entidad');
+      return;
     }
 
-    // Detecta cambios en las entradas (@Input)
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes['contacto']) {
-            // Selecciona automáticamente la entidad del contacto al editar
-            this.selectedEntidad = this.contacto?.entidad_id ?? null;
-        }
+    if (!this.contacto.nombre?.trim()) {
+      this.showAlert('warning', 'Nombre requerido', 'Debes ingresar el nombre');
+      return;
     }
 
-    // Cargar entidades desde la API
-    loadEntidades() {
-        this.http.get<any[]>('http://localhost:8000/api/entidades')
-            .subscribe({
-                next: data => this.entidades = data, // guarda entidades
-                error: () => {                       // error al cargar
-                    Swal.fire(
-                        'Error',
-                        'No se pudieron cargar las entidades',
-                        'error'
-                    );
-                }
-            });
+    if (!this.contacto.identificacion?.trim()) {
+      this.showAlert('warning', 'Identificación requerida', 'Debes ingresar la identificación');
+      return;
     }
 
-    // Guardar contacto
-    save() {
-        //  Validación: debe seleccionar una entidad
-        if (!this.selectedEntidad) {
-            Swal.fire(
-                'Entidad requerida',
-                'Debes seleccionar una entidad antes de guardar el contacto.',
-                'warning'
-            );
-            return;
-        }
-
-        // 🔹 Asignar la entidad seleccionada al contacto
-        this.contacto.entidad_id = this.selectedEntidad;
-
-        // 🔹 Emitir el contacto al componente padre
-        this.saveContacto.emit(this.contacto);
-
-        // 🔹 Cerrar modal
-        this.close();
+    if (!this.contacto.correo?.trim()) {
+      this.showAlert('warning', 'Correo requerido', 'Debes ingresar el correo');
+      return;
     }
 
-    // Cerrar modal desde UI
-    hide() {
-        this.close();
+    if (!this.contacto.telefono?.trim()) {
+      this.showAlert('warning', 'Teléfono requerido', 'Debes ingresar el teléfono');
+      return;
     }
 
-    // Cerrar modal y avisar al padre
-    close() {
-        this.visibleChange.emit(false);
+    if (!this.contacto.cargo?.trim()) {
+      this.showAlert('warning', 'Cargo requerido', 'Debes ingresar el cargo');
+      return;
     }
+
+    // Asignamos el id seleccionado
+    this.contacto.entidad_id = this.selectedEntidad;
+
+    // 🔹 Cerramos el modal inmediatamente
+    this.visible = false;
+    this.visibleChange.emit(false);
+
+    // 🔹 Emitimos el contacto al padre
+    this.saveContacto.emit(this.contacto);
+  }
+
+  hide() {
+    this.visible = false;
+    this.visibleChange.emit(false);
+  }
+
+  showAlert(icon: SweetAlertIcon, title: string, text: string) {
+    return Swal.fire({
+      icon,
+      title,
+      text,
+      customClass: { popup: 'swal-zindex' }
+    });
+  }
 }

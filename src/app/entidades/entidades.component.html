@@ -1,102 +1,84 @@
 <p-card header="Entidades">
+  <p-toast></p-toast>
 
-    <p-toast />
-    <p-toolbar styleClass="mb-4 gap-2">
-        <ng-template pTemplate="left">
-            <p-button severity="info" label="Todos los Contactos" class="ml-2" styleClass="mr-2"
-                (onClick)="verTodosContactos()">
-                <i class="pi pi-users mr-2"></i>
-            </p-button>
-            <p-button severity="success" label="Nueva" styleClass="mr-2" (onClick)="openNew()">
-                <i class="bi bi-plus-circle-dotted mr-2"></i>
-            </p-button>
-            <p-button severity="danger" label="Eliminar" [disabled]="!selectedEntidades.length"
-                [badge]="selectedEntidades.length.toString()" (onClick)="deleteSelected()">
-                <i class="bi bi-trash3 mr-2"></i>
-            </p-button>
-        </ng-template>
-        <ng-template pTemplate="right"></ng-template>
-    </p-toolbar>
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button severity="info" label="Todos los Contactos" class="ml-2" styleClass="mr-2"
+        (onClick)="verTodosContactos()">
+        <i class="pi pi-users mr-2"></i>
+      </p-button>
 
-    <app-modal-entidad [(visible)]="entidadDialog" [entidad]="entidad" (saveEntidad)="save($event)">
-    </app-modal-entidad>
+      <p-button severity="success" label="Nueva" styleClass="mr-2" (onClick)="openNew()">
+        <i class="bi bi-plus-circle-dotted mr-2"></i>
+      </p-button>
 
-    <p-table #dt [value]="entidadesService.entidades()" [rows]="10" [paginator]="true"
-        [globalFilterFields]="['nombrec','nit','telefono','direccion']" [tableStyle]="{ 'min-width': '75rem' }"
-        [rowHover]="true" dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-        [showCurrentPageReport]="true" [loading]="entidadesService.loading()" [(selection)]="selectedEntidades">
+      <p-button severity="danger" label="Eliminar" [disabled]="!selectedEntidades.length"
+        [badge]="selectedEntidades.length.toString()" (onClick)="deleteSelected()">
+        <i class="bi bi-trash3 mr-2"></i>
+      </p-button>
+    </ng-template>
+  </p-toolbar>
 
-        <!-- BUSCADOR GLOBAL -->
-        <ng-template pTemplate="caption">
-            <div class="flex align-items-center justify-content-between">
-                <h5 class="m-0">Lista de entidades</h5>
-                <span class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <input pInputText type="text" (input)="applyFilter($event)" placeholder="Buscar..."
-                        class="buscador" />
+  <app-modal-entidad [(visible)]="entidadDialog" [entidad]="entidad" (saveEntidad)="handleSave($event)">
+  </app-modal-entidad>
 
-                </span>
-            </div>
-        </ng-template>
+  <p-table #dt [value]="entidades" [rows]="10" [paginator]="true"
+    [globalFilterFields]="['nombrec','nit','telefono','direccion']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true" dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+    [showCurrentPageReport]="true"
+    [loading]="entidadesService.loading()"
+    [(selection)]="selectedEntidades">
 
-        <ng-template pTemplate="header">
-            <tr>
-                <th style="width: 4rem">
-                    <p-tableHeaderCheckbox />
-                </th>
-                <th pSortableColumn="nombrec" style="min-width:15rem">
-                    Nombre
-                </th>
-                <th pSortableColumn="nit">
-                    Nit
-                </th>
-                <th pSortableColumn="telefono">
-                    Teléfono
-                </th>
-                <th pSortableColumn="direccion" style="min-width:10rem">
-                    Dirección
-                </th>
-                <th>
-                    Opciones
-                </th>
-            </tr>
-        </ng-template>
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <h5 class="m-0">Lista de entidades</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" (input)="applyFilter($event)" placeholder="Buscar..." class="buscador" />
+        </span>
+      </div>
+    </ng-template>
 
-        <ng-template pTemplate="body" let-entidad>
-            <tr>
-                <td>
-                    <p-tableCheckbox [value]="entidad" />
-                </td>
-                <td>{{ entidad.nombrec }}</td>
-                <td>{{ entidad.nit }}</td>
-                <td>{{ entidad.telefono }}</td>
-                <td>{{ entidad.direccion }}</td>
-                <td>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox />
+        </th>
+        <th pSortableColumn="nombrec" style="min-width:15rem">Nombre</th>
+        <th pSortableColumn="email" style="min-width:15rem">Email</th>
+        <th pSortableColumn="nit">Nit</th>
+        <th pSortableColumn="telefono">Teléfono</th>
+        <th pSortableColumn="direccion" style="min-width:10rem">Dirección</th>
+        <th>Opciones</th>
+      </tr>
+    </ng-template>
 
-                    <!-- Botón Editar -->
-                    <p-button icon="bi bi-pencil" severity="success" [rounded]="true" [outlined]="true"
-                        class="p-button-icon-only mr-2" (onClick)="edit(entidad)">
-                    </p-button>
+    <ng-template pTemplate="body" let-entidad>
+      <tr>
+        <td><p-tableCheckbox [value]="entidad" /></td>
+        <td>{{ entidad.nombrec }}</td>
+        <td>{{ entidad.email }}</td>
+        <td>{{ entidad.nit }}</td>
+        <td>{{ entidad.telefono }}</td>
+        <td>{{ entidad.direccion }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+            (onClick)="edit(entidad)" />
+          <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
+            (onClick)="deleteEntidad(entidad)" />
+          <p-button icon="pi pi-users" severity="info" [rounded]="true" [outlined]="true"
+            (onClick)="verContactos(entidad)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
 
-                    <!-- Botón Eliminar -->
-                    <p-button icon="bi bi-trash3" severity="danger" [rounded]="true" [outlined]="true"
-                        class="p-button-icon-only mr-2" (onClick)="deleteEntidad(entidad)">
-                    </p-button>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Total {{ total() }} entidades.
+      </div>
+    </ng-template>
 
-                    <!-- Botón Ver Contactos -->
-                    <p-button icon="bi bi-people" severity="info" [rounded]="true" [outlined]="true"
-                        class="p-button-icon-only" (onClick)="verContactos(entidad)">
-                    </p-button>
-
-                </td>
-            </tr>
-        </ng-template>
-
-        <ng-template pTemplate="summary">
-            <div class="flex align-items-center justify-content-between">
-                Total {{ total() }} entidades.
-            </div>
-        </ng-template>
-    </p-table>
-
+  </p-table>
 </p-card>

@@ -1,21 +1,16 @@
-// herramientas 
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
+import { TableModule, Table } from 'primeng/table';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalContactoComponent } from './modal-contacto.component';
+import Swal from 'sweetalert2';
+import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
-import Swal from 'sweetalert2'; // instalamos sweetalert para las alertas mas dinamicas y interactivas
-import { ViewChild } from '@angular/core';
-import { Table } from 'primeng/table';
 
-// Decorador que define el componente, su HTML, CSS, dependencias y servicios
 @Component({
   selector: 'app-contactos',
   standalone: true,
@@ -29,11 +24,8 @@ import { Table } from 'primeng/table';
     ModalContactoComponent
   ],
   templateUrl: './contactos.component.html',
-  styleUrls: ['./contactos.component.css'],
-  providers: [MessageService]
+  styleUrls: ['./contactos.component.css']
 })
-
-// controlador de contactos aca hacemos la logica de los contactos 
 export class ContactosComponent implements OnInit {
 
   contactos: any[] = [];
@@ -45,19 +37,16 @@ export class ContactosComponent implements OnInit {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-
   private baseUrl = 'http://localhost:8000/api';
+
+  @ViewChild('dt') dt!: Table;
 
   ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('entidadId');
     if (idParam) this.entidadId = Number(idParam);
-
     this.loadContactos();
   }
-  @ViewChild('dt') dt!: Table;
 
-
-  // CARGAR CONTACTOS
   loadContactos() {
     const url = this.entidadId
       ? `${this.baseUrl}/entidades/${this.entidadId}/contactos`
@@ -65,39 +54,29 @@ export class ContactosComponent implements OnInit {
 
     this.http.get<any[]>(url).subscribe({
       next: data => this.contactos = data,
-      error: () => {
-        Swal.fire('Error', 'No se pudieron cargar los contactos', 'error');
-      }
+      error: () => Swal.fire('Error', 'No se pudieron cargar los contactos', 'error')
     });
   }
 
-  // VOLVER A ENTIDADES
-  volverEntidades() {
-    this.router.navigate(['/entidades']);
-  }
-
-
-  // ABRIR NUEVO
   openNew() {
-    this.contacto = { entidad_id: this.entidadId ?? null };
+    this.contacto = {
+      nombre: '',
+      identificacion: '',
+      telefono: '',
+      correo: '',
+      cargo: '',
+      entidad_id: this.entidadId ?? null
+    };
     this.contactoDialog = true;
   }
 
-  applyFilter(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.dt.filterGlobal(input.value, 'contains');
-  }
-
-
-  // EDITAR
   edit(contacto: any) {
+    // 🔹 Solo copiamos los datos actuales
     this.contacto = { ...contacto };
     this.contactoDialog = true;
   }
 
-  // ELIMINAR UNO
   delete(contacto: any) {
-
     if (!contacto.id) return;
 
     Swal.fire({
@@ -108,35 +87,19 @@ export class ContactosComponent implements OnInit {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
-
       if (!result.isConfirmed) return;
 
-      this.http.delete(`${this.baseUrl}/contactos/${contacto.id}`)
-        .subscribe({
-          next: () => {
-            this.loadContactos();
-
-            Swal.fire(
-              'Eliminado!',
-              'Contacto eliminado correctamente',
-              'success'
-            );
-          },
-          error: () => {
-            Swal.fire(
-              'Error',
-              'No se pudo eliminar el contacto',
-              'error'
-            );
-          }
-        });
-
+      this.http.delete(`${this.baseUrl}/contactos/${contacto.id}`).subscribe({
+        next: () => {
+          this.loadContactos();
+          Swal.fire('Eliminado!', 'Contacto eliminado correctamente', 'success');
+        },
+        error: () => Swal.fire('Error', 'No se pudo eliminar el contacto', 'error')
+      });
     });
   }
 
-  // ELIMINAR MÚLTIPLES
   deleteSelected() {
-
     if (!this.selectedContactos.length) return;
 
     Swal.fire({
@@ -147,7 +110,6 @@ export class ContactosComponent implements OnInit {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
-
       if (!result.isConfirmed) return;
 
       const requests = this.selectedContactos.map(c =>
@@ -158,90 +120,82 @@ export class ContactosComponent implements OnInit {
         next: () => {
           this.loadContactos();
           this.selectedContactos = [];
-
-          Swal.fire(
-            'Eliminados!',
-            'Contactos eliminados correctamente',
-            'success'
-          );
+          Swal.fire('Eliminados!', 'Contactos eliminados correctamente', 'success');
         },
-        error: () => {
-          Swal.fire(
-            'Error',
-            'Ocurrió un error eliminando contactos',
-            'error'
-          );
-        }
+        error: () => Swal.fire('Error', 'Ocurrió un error eliminando contactos', 'error')
       });
-
     });
   }
 
-  // GUARDAR / ACTUALIZAR
   saveContactoHandler(contacto: any) {
+    console.log('Enviando contacto:', contacto);
 
     const esEdicion = !!contacto.id;
 
-    Swal.fire({
-      title: esEdicion ? '¿Actualizar contacto?' : '¿Crear contacto?',
-      text: esEdicion
-        ? 'Los datos serán actualizados'
-        : 'Se registrará un nuevo contacto',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: esEdicion ? 'Sí, actualizar' : 'Sí, crear',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    const action$ = esEdicion
+      ? this.http.put(`${this.baseUrl}/contactos/${contacto.id}`, contacto)
+      : this.http.post(`${this.baseUrl}/entidades/${contacto.entidad_id}/contactos`, contacto);
 
-      if (!result.isConfirmed) return;
+    action$.subscribe({
+      next: () => {
+        this.loadContactos();
+        this.contactoDialog = false;
 
-      if (esEdicion) {
+        setTimeout(() => {
+          Swal.fire(
+            esEdicion ? 'Actualizado!' : 'Creado!',
+            esEdicion
+              ? 'Contacto actualizado correctamente'
+              : 'Contacto creado correctamente',
+            'success'
+          );
+        }, 100);
+      },
+      error: (err) => {
+        this.contactoDialog = false;
 
-        this.http.put(`${this.baseUrl}/contactos/${contacto.id}`, contacto)
-          .subscribe({
-            next: () => {
-              this.loadContactos();
-              this.contactoDialog = false;
+        if (err.status === 422) {
+          const errors = err.error.errors;
+          const messages: string[] = [];
 
-              Swal.fire(
-                'Actualizado!',
-                'Contacto actualizado correctamente',
-                'success'
-              );
-            },
-            error: () => {
-              Swal.fire(
-                'Error',
-                'No se pudo actualizar el contacto',
-                'error'
-              );
+          // 🔹 Solo mostramos errores si el campo fue modificado
+          if (errors.correo && contacto.correo !== undefined) {
+            messages.push(...errors.correo);
+          }
+          if (errors.identificacion && contacto.identificacion !== undefined) {
+            messages.push(...errors.identificacion);
+          }
+
+          for (const key of Object.keys(errors)) {
+            if (key !== 'correo' && key !== 'identificacion') {
+              messages.push(...errors[key]);
             }
-          });
+          }
 
-      } else {
-
-        this.http.post(`${this.baseUrl}/entidades/${contacto.entidad_id}/contactos`, contacto)
-          .subscribe({
-            next: () => {
-              this.loadContactos();
-              this.contactoDialog = false;
-
-              Swal.fire(
-                'Creado!',
-                'Contacto creado correctamente',
-                'success'
-              );
-            },
-            error: () => {
-              Swal.fire(
-                'Error',
-                'No se pudo crear el contacto',
-                'error'
-              );
-            }
-          });
+          if (messages.length > 0) {
+            Swal.fire('Errores de validación', messages.join('\n'), 'error');
+          }
+        } else {
+          Swal.fire(
+            'Error',
+            esEdicion
+              ? 'No se pudo actualizar el contacto'
+              : 'No se pudo crear el contacto',
+            'error'
+          );
+        }
       }
-
     });
+  }
+
+  applyFilter(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (this.dt) {
+      this.dt.filterGlobal(input.value, 'contains');
+    }
+  }
+
+  volverEntidades() {
+    this.router.navigate(['/entidades']);
   }
 }
