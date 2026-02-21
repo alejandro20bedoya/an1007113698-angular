@@ -23,13 +23,9 @@
   </app-modal-entidad>
 
   <p-table #dt [value]="entidades" [rows]="10" [paginator]="true"
-    [globalFilterFields]="['nombrec','nit','telefono','direccion']"
-    [tableStyle]="{ 'min-width': '75rem' }"
-    [rowHover]="true" dataKey="id"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-    [showCurrentPageReport]="true"
-    [loading]="entidadesService.loading()"
-    [(selection)]="selectedEntidades">
+    [globalFilterFields]="['nombrec','nit','telefono','direccion']" [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true" dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+    [showCurrentPageReport]="true" [loading]="entidadesService.loading()" [(selection)]="selectedEntidades">
 
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between">
@@ -46,11 +42,25 @@
         <th style="width: 4rem">
           <p-tableHeaderCheckbox />
         </th>
-        <th pSortableColumn="nombrec" style="min-width:15rem">Nombre</th>
-        <th pSortableColumn="email" style="min-width:15rem">Email</th>
-        <th pSortableColumn="nit">Nit</th>
-        <th pSortableColumn="telefono">Teléfono</th>
-        <th pSortableColumn="direccion" style="min-width:10rem">Dirección</th>
+        <th pSortableColumn="nombrec" style="min-width:15rem">
+          Nombre <p-sortIcon field="nombrec"></p-sortIcon>
+        </th>
+
+        <th pSortableColumn="email" style="min-width:15rem">
+          Email <p-sortIcon field="email"></p-sortIcon>
+        </th>
+
+        <th pSortableColumn="nit">
+          Nit <p-sortIcon field="nit"></p-sortIcon>
+        </th>
+
+        <th pSortableColumn="telefono">
+          Teléfono <p-sortIcon field="telefono"></p-sortIcon>
+        </th>
+
+        <th pSortableColumn="direccion" style="min-width:10rem">
+          Dirección <p-sortIcon field="direccion"></p-sortIcon>
+        </th>
         <th>Opciones</th>
       </tr>
     </ng-template>

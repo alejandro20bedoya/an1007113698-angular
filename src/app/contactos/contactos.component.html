@@ -30,12 +30,12 @@
     <ng-template pTemplate="header">
       <tr>
         <th><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
-        <th>Nombre</th>
-        <th>Identificación</th>
-        <th>Correo</th>
-        <th>Teléfono</th>
-        <th>Cargo</th>
-        <th>Entidad</th>
+        <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon></th>
+        <th pSortableColumn="identificacion">Identificación <p-sortIcon field="identificacion"></p-sortIcon></th>
+        <th pSortableColumn="correo">Correo <p-sortIcon field="correo"></p-sortIcon></th>
+        <th pSortableColumn="telefono">Teléfono <p-sortIcon field="telefono"></p-sortIcon></th>
+        <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon></th>
+        <th pSortableColumn="entidad.nombrec">Entidad <p-sortIcon field="entidad.nombrec"></p-sortIcon></th>
         <th>Acciones</th>
       </tr>
     </ng-template>
